@@ -4,30 +4,39 @@ using UnityEngine;
 
 public class GameSystem : MonoBehaviour
 {
-     static GameObject selectedLight;
-     static GameObject buildPanel;
-     static GameObject currentSelected;
+    static GameObject selectedLight;
+    static GameObject buildPanel;
+    static GameObject currentSelected;
+    static GameObject mainCamera;
+    static bool initialized = false;
 
     public static void init()
     {
-        if (selectedLight) return;
-        selectedLight = GameObject.Find("SelectedLight");
-        buildPanel = GameObject.Find("BuildPanel");
+        if (initialized == false)
+        {
+            initialized = true;
+            selectedLight = GameObject.Find("SelectedLight");
+            buildPanel = GameObject.Find("BuildPanel");
+            buildPanel.SetActive(false);
+            mainCamera = GameObject.Find("MainCamera");
+        }        
     }
-    public static void onClickElemnt(GameObject GO)
+
+    public static void onClickElement(GameObject GO)
     {
-        init();
         if (GO.tag == "Build" || GO.tag == "Place")
         {
-            currentSelected = GO;
-            Debug.Log(currentSelected.tag);
-            Debug.Log(selectedLight);
+            currentSelected = GO;            
             var pos = currentSelected.transform.position;
-            selectedLight.transform.position = new Vector3(pos.x,.1f,pos.z);
-	if ( GO.tag == "Build" ) buildPanel.SetActive(true);
-	else buildPanel.SetActive(false);        
-	}
-	
-        
+            selectedLight.transform.position = new Vector3(pos.x, .1f, pos.z);
+            mainCamera.transform.position = new Vector3(pos.x, 5f, pos.z-5f);
+            buildPanel.SetActive(false);
+            if (GO.tag == "Place") buildPanel.SetActive(true);            
+        }
+    }
+
+    public static void onClickUI(string name = "none")
+    {
+        Debug.Log(name);
     }
 }
