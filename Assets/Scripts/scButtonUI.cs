@@ -6,6 +6,6 @@ public class scButtonUI : MonoBehaviour
 {
     public void onClicMe()
     {
-        GameSystem.onClickUI(gameObject.name);
+        GameSystem.get_instance().onClickUI(gameObject.name);
     }
 }

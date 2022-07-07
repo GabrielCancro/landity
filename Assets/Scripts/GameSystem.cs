@@ -4,39 +4,50 @@ using UnityEngine;
 
 public class GameSystem : MonoBehaviour
 {
-    static GameObject selectedLight;
-    static GameObject buildPanel;
-    static GameObject currentSelected;
-    static GameObject mainCamera;
-    static bool initialized = false;
+    static GameSystem instance = null;
+    GameObject selectedLight;
+    GameObject buildPanel;
+    GameObject currentSelected;
+    GameObject mainCamera;
+    public GameObject prefabBuild;
 
-    public static void init()
+    public static GameSystem get_instance()
     {
-        if (initialized == false)
-        {
-            initialized = true;
-            selectedLight = GameObject.Find("SelectedLight");
-            buildPanel = GameObject.Find("BuildPanel");
-            buildPanel.SetActive(false);
-            mainCamera = GameObject.Find("MainCamera");
-        }        
+        return instance;
     }
 
-    public static void onClickElement(GameObject GO)
+    private void Start()
+    {
+        if (!instance) instance = this;
+        selectedLight = GameObject.Find("SelectedLight");
+        buildPanel = GameObject.Find("BuildPanel");
+        buildPanel.SetActive(false);
+        mainCamera = GameObject.Find("MainCamera");
+    }
+
+    public void onClickElement(GameObject GO)
     {
         if (GO.tag == "Build" || GO.tag == "Place")
         {
+            Debug.Log(GO);
             currentSelected = GO;            
             var pos = currentSelected.transform.position;
             selectedLight.transform.position = new Vector3(pos.x, .1f, pos.z);
-            mainCamera.transform.position = new Vector3(pos.x, 5f, pos.z-5f);
+            mainCamera.GetComponent<scCamera>().destine = new Vector3(pos.x, 5f, pos.z-5f);
             buildPanel.SetActive(false);
             if (GO.tag == "Place") buildPanel.SetActive(true);            
         }
     }
 
-    public static void onClickUI(string name = "none")
+    public void onClickUI(string name = "none")
     {
         Debug.Log(name);
+        if (name == "Camp" || name == "Barrack" || name == "Tower")
+        {
+            var BUILD = Instantiate(prefabBuild, currentSelected.transform.position, Quaternion.identity);
+            BUILD.GetComponent<scBuild>().setType(name);
+            Destroy(currentSelected);
+            onClickElement(BUILD);
+        }
     }
 }

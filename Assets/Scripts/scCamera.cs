@@ -4,14 +4,25 @@ using UnityEngine;
 
 public class scCamera : MonoBehaviour
 {
+
+    public Vector3 destine = new Vector3();
+    float speed = .01f;
+
     // Start is called before the first frame update
     void Start()
     {
-        GameSystem.init();
+        destine = gameObject.transform.position;
     }
 
     // Update is called once per frame
     void Update()
+    {
+        clickRaycast();
+        moveKeyboard();
+        moveToDestine();
+    }
+
+    void clickRaycast()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -21,20 +32,30 @@ public class scCamera : MonoBehaviour
             {
                 if (raycastHit.transform != null && raycastHit.transform.gameObject != null)
                 {
-                    GameSystem.onClickElement(raycastHit.transform.gameObject);
+                    GameSystem.get_instance().onClickElement(raycastHit.transform.gameObject);
                 }
-                
+
             }
         }
-        movementUpdate();
+    }
+    void moveKeyboard()
+    {
+        var mov = new Vector3();
+        if (Input.GetKey("w")) mov.z += 1.5f;
+        if (Input.GetKey("s")) mov.z -= 1.5f;
+        if (Input.GetKey("a")) mov.x -= 1.5f;
+        if (Input.GetKey("d")) mov.x += 1.5f;
+        if (mov.magnitude != 0) destine = gameObject.transform.position + mov;
     }
 
-    void movementUpdate()
+    void moveToDestine()
     {
-        if (Input.GetKey("w")) gameObject.transform.position += new Vector3(0, 0, +.05f);
-        if (Input.GetKey("s")) gameObject.transform.position += new Vector3(0, 0, -.05f);
-        if (Input.GetKey("a")) gameObject.transform.position += new Vector3(-.05f, 0, 0);
-        if (Input.GetKey("d")) gameObject.transform.position += new Vector3(+.05f, 0, 0);
+        if (Vector3.Distance(destine, gameObject.transform.position) > speed)
+        {
+            var mov = (destine - gameObject.transform.position) * .8f;
+            gameObject.transform.position += mov * speed;
+        }
     }
+
 
 }
